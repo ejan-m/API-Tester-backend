@@ -32,13 +32,24 @@ def run_tests():
                 responses.append(response)
                 continue
 
+
+            content_type = response.headers.get('Content-Type', '')
+            if 'application/json' in content_type:
+                body = response.json()
+            elif 'application/xml' in content_type or 'text/xml' in content_type:
+                body = response.text
+            else:
+                body = response.text  # Fallback for other text formats
+
+
             responses.append({
-               'status_code': response.status_code,
-               'body': response.json()
+                'status_code': response.status_code,
+                'body': body,
+                'content_type': content_type
             })
 
         except Exception as e:
-            responses.append({'status_code': 'error', 'body': {'error': str(e)}})
+            responses.append({'status_code': 'error', 'body': {'error': str(e)}, 'content_type': ''})
 
     return jsonify({'responses': responses})
 
