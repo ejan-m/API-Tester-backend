@@ -14,19 +14,42 @@ def run_tests():
     for api in apis:
         method = api.get('method', 'GET').upper()
         url = api.get('url', '')
-        params = {param['key']: param['value'] for param in api.get('params', [])}
         headers = {header['key']: header['value'] for header in api.get('headers', [])}
         body = api.get('body', '')
 
+        # payload_content_type = headers.get('Content-Type', '')
+        # if 'application/xml' in payload_content_type:
+        #     body = {
+        #         "Destination": url,
+        #         "Message": body,
+        #         "Note": "Modified by Shawn"
+        #     }
+
+        #     url = 'http://localhost:1003/api/Values/IPC_talk'
+        #     headers = {'Content-Type': 'application/json'}
+
+        # print(url)
+        # print(body)
+        print(method)
         try:
             if method == 'GET':
-                response = requests.get(url, params=params, headers=headers, verify=False)
+                response = requests.get(url, headers=headers, verify=False)
             elif method == 'POST':
-                response = requests.post(url, params=params, headers=headers, data=body, verify=False)
+                response = requests.post(url, headers=headers, json=body, verify=False)
             elif method == 'PUT':
-                response = requests.put(url, params=params, headers=headers, data=body, verify=False)
+                response = requests.put(url, headers=headers, json=body, verify=False)
             elif method == 'DELETE':
-                response = requests.delete(url, params=params, headers=headers, data=body, verify=False)
+                response = requests.delete(url, headers=headers, json=body, verify=False)
+            elif method == 'MIPC':
+                body = {
+                    "Destination": url,
+                    "Message": body,
+                    "Note": "Modified by Shawn"
+                }
+
+                url = 'http://localhost:1003/api/Values/IPC_talk'
+
+                response = requests.post(url, headers=headers, json=body, verify=False)
             else:
                 response = {'error': 'Unsupported method'}
                 responses.append(response)
